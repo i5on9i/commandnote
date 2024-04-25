@@ -6,6 +6,7 @@ import * as contrib from 'blessed-contrib'
 
 class CommandList {
   private parent: blessed.Widgets.Screen
+
   constructor(parent: blessed.Widgets.Screen) {
     this.parent = parent
   }
@@ -54,11 +55,14 @@ class CommandList {
     });
     list.setItems(commands);
     list.focus();
+
+    commands.forEach((command, index) => {
+      const aLine = list.getItem(index)
+      aLine.setHover(aLine.getText())
+    })
+
   }
 
-  get commands() {
-    return ['test1', 'test2']
-  }
 }
 
 const screen: blessed.Widgets.Screen = blessed.screen({
@@ -127,12 +131,8 @@ var donut: contrib.Widgets.DonutElement = grid.set(8, 8, 4, 2, contrib.donut,
 // });
 
 const cmdlist = new CommandList(screen);
-cmdlist.create(cmdlist.commands);
+cmdlist.create(['test1', 'test2']);
 
-// list.items.forEach(function (item, i) {
-//     var text = item.getText();
-//     item.setHover(map[text]);
-// });
 
 // list.focus();
 // list.enterSelected(0);

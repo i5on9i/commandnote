@@ -174,5 +174,8 @@ cmdlist.create(cmdlist.commands);
 //     screen.render();
 //     screen.log(`Selected: ${item.key}`);
 // });
+screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+  return process.exit(0);
+});
 
 screen.render()

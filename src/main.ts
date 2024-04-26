@@ -3,6 +3,8 @@
 import * as blessed from 'blessed'
 import { exec } from 'child_process'
 import * as contrib from 'blessed-contrib'
+import * as fs from 'fs'
+import * as path from 'path'
 
 
 class CommandList {
@@ -15,7 +17,18 @@ class CommandList {
   }
 
   create(commands: string[]) {
-    const list = blessed.list({
+    // read from file
+    try {
+      const commandsStored = fs.readFileSync(path.join(__dirname, 'commands'), 'utf8')
+      // insert loaded commands to the list
+      commandsStored.split('\n').forEach(command => {
+        commands.push(command)
+      })
+    } catch (err) {
+      console.error(err)
+    }
+
+    const list: blessed.Widgets.ListElement = blessed.list({
       // https://github.com/chjj/blessed?tab=readme-ov-file#list-from-box
       parent: this.parent,
       label: ' {bold}{cyan-fg}Command List{/cyan-fg}{/bold} ',
@@ -23,7 +36,7 @@ class CommandList {
       draggable: true,
       top: 0,
       right: 0,
-      width: 100,
+      width: 50,
       height: '50%',
       keys: true,
       vi: true,
@@ -58,6 +71,8 @@ class CommandList {
     });
     list.setItems(commands);
     list.focus();
+
+    list.enterSelected(0)
 
     commands.forEach((command, index) => {
       const aLine = list.getItem(index)
@@ -94,8 +109,39 @@ const screen: blessed.Widgets.Screen = blessed.screen({
 screen.title = "wsl commander"
 //create layout and widgets
 
-const grid: contrib.Widgets.GridElement = new contrib.grid({ rows: 12, cols: 12, screen: screen })
 
+
+// const grid: contrib.Widgets.GridElement = new contrib.grid({ rows: 12, cols: 12, screen: screen })
+
+// /**
+//  * Donut Options
+//   self.options.radius = options.radius || 14; // how wide is it? over 5 is best
+//   self.options.arcWidth = options.arcWidth || 4; //width of the donut
+//   self.options.yPadding = options.yPadding || 2; //padding from the top
+//  */
+// var donut: contrib.Widgets.DonutElement = grid.set(8, 8, 4, 2, contrib.donut,
+//   {
+//     label: 'Percent Donut',
+//     radius: 16,
+//     arcWidth: 4,
+//     yPadding: 2,
+//     data: [{ label: 'Storage', percent: 87 }]
+//   })
+
+
+var prompt = blessed.prompt({
+  parent: screen,
+  top: 'center',
+  left: 'center',
+  height: 'shrink',
+  width: 'shrink',
+  keys: true,
+  vi: true,
+  mouse: true,
+  tags: true,
+  border: 'line',
+  hidden: false
+});
 
 var msg = blessed.message({
   parent: screen,
@@ -151,7 +197,7 @@ cmdlist.create(['test1', 'test2']);
 //     screen.render();
 //     screen.log(`Selected: ${item.key}`);
 // });
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+screen.key(['escape', 'q', 'C-c'], function (ch, key) {
   return process.exit(0);
 });
 

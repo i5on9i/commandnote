@@ -107,6 +107,8 @@ const screen: blessed.Widgets.Screen = blessed.screen({
   smartCSR: true,
 })
 screen.title = "wsl commander"
+screen.fullUnicode = true // for unicode characters
+
 //create layout and widgets
 
 

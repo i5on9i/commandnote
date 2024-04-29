@@ -77,9 +77,10 @@ class CommandList {
     list.on('select', function (el, selected) {
       if (list._.rendering) return;
       const selCommand = el.getText()
-      _this.msg.error("errnamh")
+      const cmdWithoutComment = _this._extractCommand(selCommand)
+
       // run dir
-      exec(selCommand, (err, stdout, stderr) => {
+      exec(cmdWithoutComment, (err, stdout, stderr) => {
         if (err) {
           _this.msg.error(err.message)
           return
@@ -109,6 +110,12 @@ class CommandList {
       console.error(err)
     }
     return commands;
+  }
+
+  _extractCommand(commandWithComment: string): string {
+    const commentStartIdx = commandWithComment.indexOf('#')
+    const cmdWithoutComment = commandWithComment.substring(0, commentStartIdx === -1 ? commandWithComment.length : commentStartIdx).trim();
+    return cmdWithoutComment
   }
 
 }

@@ -7,6 +7,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 
+
 class CommandList {
   parent: blessed.Widgets.Screen
   msg: blessed.Widgets.MessageElement
@@ -17,16 +18,9 @@ class CommandList {
   }
 
   create(commands: string[]) {
-    // read from file
-    try {
-      const commandsStored = fs.readFileSync(path.join(__dirname, 'commands'), 'utf8')
-      // insert loaded commands to the list
-      commandsStored.split('\n').forEach(command => {
-        commands.push(command)
-      })
-    } catch (err) {
-      console.error(err)
-    }
+
+    // combine two arrays
+    commands = commands.concat(this._readCommands())
 
     const list: blessed.Widgets.ListElement = blessed.list({
       // https://github.com/chjj/blessed?tab=readme-ov-file#list-from-box
@@ -82,9 +76,10 @@ class CommandList {
     const _this = this
     list.on('select', function (el, selected) {
       if (list._.rendering) return;
+      const selCommand = el.getText()
       _this.msg.error("errnamh")
       // run dir
-      exec("dir", (err, stdout, stderr) => {
+      exec(selCommand, (err, stdout, stderr) => {
         if (err) {
           _this.msg.error(err.message)
           return
@@ -101,6 +96,21 @@ class CommandList {
 
   }
 
+  _readCommands(): string[] {
+    const commands = [] as string[]
+    // read from file
+    try {
+      const commandsStored = fs.readFileSync(path.join(__dirname, 'commands'), 'utf8')
+      // insert loaded commands to the list
+      commandsStored.split('\n').forEach(command => {
+        commands.push(command)
+      })
+    } catch (err) {
+      console.error(err)
+    }
+    return commands;
+  }
+
 }
 
 const screen: blessed.Widgets.Screen = blessed.screen({
@@ -111,6 +121,9 @@ screen.fullUnicode = true // for unicode characters
 
 //create layout and widgets
 
+
+// Backup the current screen output
+const screenOutputBackup = screen.output;
 
 
 // const grid: contrib.Widgets.GridElement = new contrib.grid({ rows: 12, cols: 12, screen: screen })
